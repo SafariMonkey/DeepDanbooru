@@ -90,7 +90,7 @@ class DatasetWrapper:
 
         # transform tag
         tag_string = tag_string.numpy().decode()
-        tag_array = np.array(tag_string.split(' '))
+        tag_array = np.array(tag_string.split(','))
 
         labels = np.where(np.isin(self.tag_all_array,
                                   tag_array), 1, 0).astype(np.float32)
