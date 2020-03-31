@@ -19,7 +19,13 @@ def load_image_records(database_uri, images_path, minimum_tag_count):
     image_folder_path = os.path.join(os.path.dirname(images_path), 'images')
 
     cursor.execute(
-        "SELECT s.* FROM (SELECT i.image_sha512_hash AS sha512, i.image_format as file_ext, string_agg(t.name, ',') as tag_string, COUNT(t.id) AS tag_count FROM image_taggings JOIN images i ON i.id = image_id JOIN tags t on t.id = tag_id WHERE (i.image_format = 'png' OR i.image_format = 'jpg' OR i.image_format = 'jpeg') AND i.image_sha512_hash IS NOT NULL GROUP BY i.id ORDER BY i.id) s WHERE s.tag_count >= %s",
+        "CREATE MATERIALIZED VIEW IF NOT EXISTS tagged_images AS SELECT i.id AS id, i.image_sha512_hash AS sha512, i.image_format as file_ext, string_agg(t.name, ',') as tag_string, COUNT(t.id) AS tag_count FROM image_taggings JOIN images i ON i.id = image_id JOIN tags t on t.id = tag_id WHERE (i.image_format = 'png' OR i.image_format = 'jpg' OR i.image_format = 'jpeg') AND i.image_sha512_hash IS NOT NULL GROUP BY i.id",
+        (minimum_tag_count,))
+
+    connection.commit()
+
+    cursor.execute(
+        "SELECT * FROM tagged_images WHERE tag_count >= %s ORDER BY id",
         (minimum_tag_count,))
 
     colnames = [desc[0] for desc in cursor.description]
