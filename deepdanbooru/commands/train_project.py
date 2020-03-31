@@ -136,13 +136,13 @@ def train_project(project_path):
             image_records_slice = image_records[int(offset):min(
                 int(offset) + slice_size, epoch_size)]
 
-            image_paths = [image_record[0]
+            image_paths = [image_record[1]
                            for image_record in image_records_slice]
-            tag_strings = [image_record[1]
-                           for image_record in image_records_slice]
+            tag_arrays = [image_record[2]
+                          for image_record in image_records_slice]
 
             dataset_wrapper = dd.data.DatasetWrapper(
-                (image_paths, tag_strings), tags, width, height, scale_range=scale_range, rotation_range=rotation_range, shift_range=shift_range)
+                (image_paths, tag_arrays), tags, width, height, scale_range=scale_range, rotation_range=rotation_range, shift_range=shift_range)
             dataset = dataset_wrapper.get_dataset(minibatch_size)
 
             for (x_train, y_train) in dataset:
