@@ -5,6 +5,7 @@ __pycache__/
 test.py
 /logs
 /uploads
+/devenv
 *.jpg
 *.jpeg
 *.png
