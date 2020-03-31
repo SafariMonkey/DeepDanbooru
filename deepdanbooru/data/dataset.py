@@ -19,7 +19,7 @@ def load_image_records(database_uri, images_path, minimum_tag_count):
     image_folder_path = os.path.join(os.path.dirname(images_path), 'images')
 
     cursor.execute(
-        "SELECT s.* FROM (SELECT image_sha512_hash AS sha512, image_format as file_ext, string_agg(t.tag_id::text, ',') as tag_string, COUNT(t.tag_id) AS tag_count FROM images JOIN image_taggings t ON t.image_id = id WHERE (image_format = 'png' OR image_format = 'jpg' OR image_format = 'jpeg') AND image_sha512_hash IS NOT NULL GROUP BY id ORDER BY id) s WHERE s.tag_count >= %s",
+        "SELECT s.* FROM (SELECT i.image_sha512_hash AS sha512, i.image_format as file_ext, string_agg(t.name, ',') as tag_string, COUNT(t.id) AS tag_count FROM image_taggings JOIN images i ON i.id = image_id JOIN tags t on t.id = tag_id WHERE (i.image_format = 'png' OR i.image_format = 'jpg' OR i.image_format = 'jpeg') AND i.image_sha512_hash IS NOT NULL GROUP BY i.id ORDER BY i.id) s WHERE s.tag_count >= %s",
         (minimum_tag_count,))
 
     colnames = [desc[0] for desc in cursor.description]
