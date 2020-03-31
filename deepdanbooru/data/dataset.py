@@ -8,7 +8,7 @@ def load_tags(tags_path):
         return tags
 
 
-def load_image_records(database_uri, images_path, minimum_tag_count):
+def load_image_records(database_uri, images_path, minimum_tag_count, limit=None, offset=0):
     if not os.path.exists(images_path):
         raise Exception(f'Image path does not exist : {images_path}')
 
@@ -29,8 +29,8 @@ def load_image_records(database_uri, images_path, minimum_tag_count):
     connection.commit()
 
     cursor.execute(
-        "SELECT * FROM tagged_images WHERE tag_count >= %s ORDER BY id",
-        (minimum_tag_count,))
+        "SELECT * FROM tagged_images WHERE tag_count >= %s ORDER BY id LIMIT %s OFFSET %s",
+        (minimum_tag_count, limit, offset))
 
     colnames = [desc[0] for desc in cursor.description]
     col_to_index = {name: col for col, name in enumerate(colnames)}
