@@ -31,17 +31,25 @@ def download_tags(path, limit, minimum_post_count, overwrite):
     dd.commands.download_tags(path, limit, minimum_post_count, overwrite)
 
 
+# @main.command('download-images')
+# @click.option('--overwrite', help='Overwrite images if exists.', is_flag=True)
+# @click.argument('path', type=click.Path(exists=False, resolve_path=True, file_okay=False, dir_okay=True))
+# def download_images(path, limit, minimum_post_count, overwrite):
+#     dd.commands.download_images(path, limit, minimum_post_count, overwrite)
+
+
 @main.command('make-training-database')
-@click.argument('source_path', type=click.Path(exists=True, resolve_path=True, file_okay=True, dir_okay=False), nargs=1, required=True)
+@click.argument('source_format', type=click.Choice(['danbooru', 'derpibooru'], case_sensitive=False), required=True)
+@click.argument('source_uri', nargs=1, required=True)
 @click.argument('output_path', type=click.Path(exists=False, resolve_path=True, file_okay=True, dir_okay=False), nargs=1, required=True)
 @click.option('--start-id', default=1, help='Start id.', )
 @click.option('--end-id', default=sys.maxsize, help='End id.')
 @click.option('--use-deleted', help='Use deleted posts.', is_flag=True)
 @click.option('--chunk-size', default=5000000, help='Chunk size for internal processing.')
-@click.option('--overwrite', help='Overwrite tags if exists.', is_flag=True)
-@click.option('--vacuum', help='Execute VACUUM command after making database.', is_flag=True)
-def make_training_database(source_path, output_path, start_id, end_id, use_deleted, chunk_size, overwrite, vacuum):
-    dd.commands.make_training_database(source_path, output_path, start_id, end_id,
+@click.option('--overwrite', help='Overwrite view if exists.', is_flag=True)
+@click.option('--vacuum', help='Execute VACUUM command after configuring database.', is_flag=True)
+def make_training_database(source_format, source_uri, output_path, start_id, end_id, use_deleted, chunk_size, overwrite, vacuum):
+    dd.commands.make_training_database(source_format, source_uri, output_path, start_id, end_id,
                                        use_deleted, chunk_size, overwrite, vacuum)
 
 

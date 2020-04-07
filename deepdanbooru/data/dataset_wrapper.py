@@ -89,7 +89,7 @@ class DatasetWrapper:
         # image = image.astype(np.float32)
 
         # transform tag
-        tag_array = tag_array.numpy().decode()
+        tag_array = tag_array.numpy()
 
         labels = np.where(np.isin(self.tag_all_array,
                                   tag_array), 1, 0).astype(np.float32)

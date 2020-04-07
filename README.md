@@ -30,6 +30,7 @@ To install it with tensorflow, add `tensorflow` extra package.
 > pip install .[tensorflow]
 ```
 
+## TODO rewrite this
 
 ## Usage
 1. Prepare dataset. If you don't have, you can use [DanbooruDownloader](https://github.com/KichangKim/DanbooruDownloader) for download the dataset of [Danbooru](https://danbooru.donmai.us/). If you want to make your own dataset, see [Dataset Structure](#dataset-structure) section.
@@ -45,7 +46,7 @@ To install it with tensorflow, add `tensorflow` extra package.
 ```
 > deepdanbooru make-training-database [your_dataset_sqlite_path] [your_filtered_sqlite_path]
 ```
-5. Modify `project.json` in the project folder. You should change `database_path` setting to your actual sqlite file path.
+5. Modify `project.json` in the project folder. You should change `database_uri` setting to your actual local database URI and `images_path` to the folder with your images.
 6. Start training.
 ```
 > deepdanbooru train-project [your_project_folder]

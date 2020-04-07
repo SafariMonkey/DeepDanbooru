@@ -5,7 +5,8 @@ import tensorflow as tf
 DEFAULT_PROJECT_CONTEXT = {
     'image_width': 299,
     'image_height': 299,
-    'database_path': None,
+    'database_uri': None,
+    'images_path': None,
     'minimum_tag_count': 20,
     'model': 'resnet_custom_v2',
     'minibatch_size': 32,

@@ -18,6 +18,7 @@ install_requires = [
     'scikit-image>=0.15.0',
     'requests>=2.22.0',
     'six>=1.13.0',
+    'psycopg2>=2.8.4',
 ]
 tensorflow_pkg = 'tensorflow>=2.1.0'
 

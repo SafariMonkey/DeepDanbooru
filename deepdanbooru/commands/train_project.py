@@ -14,7 +14,8 @@ def train_project(project_path):
 
     width = project_context['image_width']
     height = project_context['image_height']
-    database_path = project_context['database_path']
+    database_uri = project_context['database_uri']
+    images_path = project_context['images_path']
     minimum_tag_count = project_context['minimum_tag_count']
     model_type = project_context['model']
     optimizer_type = project_context['optimizer']
@@ -81,7 +82,7 @@ def train_project(project_path):
 
     print(f'Loading database ... ')
     image_records = dd.data.load_image_records(
-        database_path, minimum_tag_count)
+        database_uri, images_path, minimum_tag_count, limit=20)
 
     # Checkpoint variables
     used_epoch = tf.Variable(0, dtype=tf.int64)
@@ -136,13 +137,15 @@ def train_project(project_path):
             image_records_slice = image_records[int(offset):min(
                 int(offset) + slice_size, epoch_size)]
 
+            urls = [image_record[0]
+                    for image_record in image_records_slice]
             image_paths = [image_record[1]
                            for image_record in image_records_slice]
             tag_arrays = [image_record[2]
                           for image_record in image_records_slice]
 
             dataset_wrapper = dd.data.DatasetWrapper(
-                (image_paths, tag_arrays), tags, width, height, scale_range=scale_range, rotation_range=rotation_range, shift_range=shift_range)
+                (urls, image_paths, tf.ragged.constant(tag_arrays)), tags, width, height, scale_range=scale_range, rotation_range=rotation_range, shift_range=shift_range)
             dataset = dataset_wrapper.get_dataset(minibatch_size)
 
             for (x_train, y_train) in dataset:

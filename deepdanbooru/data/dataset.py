@@ -4,7 +4,7 @@ import psycopg2
 
 def load_tags(tags_path):
     with open(tags_path, 'r') as tags_stream:
-        tags = [tag for tag in (tag.strip() for tag in tags_stream) if tag]
+        tags = [tag for tag in (int(tag.strip()) for tag in tags_stream if tag.strip())]
         return tags
 
 
