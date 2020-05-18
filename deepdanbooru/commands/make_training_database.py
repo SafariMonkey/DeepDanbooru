@@ -35,7 +35,7 @@ def make_training_database(source_format, source_uri, output_path, start_id, end
         {out.filename.column} TEXT,
         {out.extension.column} TEXT,
         {out.download_url.column} TEXT,
-        {out.tags.column} TEXT,
+        {out.tag_string.column} TEXT,
         {out.tag_count_general.column} INTEGER )""")
     out.connection.commit()
     print('Creating table is complete.')
@@ -47,7 +47,7 @@ def make_training_database(source_format, source_uri, output_path, start_id, end
             f'Fetching source rows ... ({current_start_id}~)')
         src.cursor.execute(
             f"""SELECT
-                {src.id._as},{src.filename._as},{src.extension._as},{src.download_url._as},{src.tags._as},{src.tag_count_general._as},{src.score._as},{src.deleted._as}
+                {src.id._as},{src.filename._as},{src.extension._as},{src.download_url._as},{src.tag_string._as},{src.tag_count_general._as},{src.score._as},{src.deleted._as}
             FROM {src.from_clause} WHERE ({src.id.query} >= {src.placeholder}) AND {src.where_clause} GROUP BY {src.group_by_clause} ORDER BY {src.id.query} ASC LIMIT {src.placeholder}""",
             (current_start_id, chunk_size))
 
@@ -63,7 +63,7 @@ def make_training_database(source_format, source_uri, output_path, start_id, end
             download_url = row[src.download_url.column]
             filename = row[src.filename.column]
             extension = row[src.extension.column]
-            tags = row[src.tags.column]
+            tag_string = row[src.tag_string.column]
             general_tag_count = row[src.tag_count_general.column]
             # score = row[src.score.column]
             is_deleted = row[src.deleted.column]
@@ -86,13 +86,13 @@ def make_training_database(source_format, source_uri, output_path, start_id, end
             #     tags += f' score:very_good'
 
             insert_params.append(
-                (post_id, filename, extension, download_url, tags, general_tag_count))
+                (post_id, filename, extension, download_url, tag_string, general_tag_count))
 
         if insert_params:
             print('Inserting ...')
             out.cursor.executemany(
                 f"""INSERT INTO {out.table} (
-                {out.id.column},{out.filename.column},{out.extension.column},{out.download_url.column},{out.tags.column},{out.tag_count_general.column})
+                {out.id.column},{out.filename.column},{out.extension.column},{out.download_url.column},{out.tag_string.column},{out.tag_count_general.column})
                 values (?, ?, ?, ?, ?, ?)""", insert_params)
             out.connection.commit()
 
@@ -140,7 +140,7 @@ class TagDatabase:
     filename = QueryColumn('filename')
     extension = QueryColumn('extension')
     download_url = QueryColumn('download_url')
-    tags = QueryColumn('tags')
+    tag_string = QueryColumn('tag_string')
     tag_count_general = QueryColumn('tag_count_general')
 
 
@@ -159,7 +159,7 @@ class DanbooruSource(SqliteDatabase, SourceDatabase):
         self.tag_delimiter = ' '
         self.filename.query = 'md5'
         # concat rating tag with rest of tag string
-        self.tags.query = f"""
+        self.tag_string.query = f"""
         ltrim(
             tag_string
             ||
@@ -197,7 +197,7 @@ class DerpibooruSource(PostgresDatabase, SourceDatabase):
 
         self.id.query = 'i.id'
         self.tag_count_general.query = 'count(t.id)'
-        self.tags.query = f"string_agg(t.name, '{self.tag_delimiter}')"
+        self.tag_string.query = f"string_agg(t.name, '{self.tag_delimiter}')"
         self.filename.query = f"lpad(i.id::text, 7, '0')"
         self.extension.query = """
         case
