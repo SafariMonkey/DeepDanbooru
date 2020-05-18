@@ -63,6 +63,11 @@ def download_category_tags(category, minimum_post_count, limit, page_size=1000, 
 
 
 def download_tags(project_path, limit, minimum_post_count, is_overwrite):
+    project_context_path = os.path.join(project_path, 'project.json')
+    project_context = dd.io.deserialize_from_json(project_context_path)
+    if project_context['source'] not in ['danbooru']:
+        raise Exception('download-tags is only available on danbooru projects')
+
     print(
         f'Start downloading tags ... (limit:{limit}, minimum_post_count:{minimum_post_count})')
 

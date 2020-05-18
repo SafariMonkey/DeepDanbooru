@@ -3,6 +3,7 @@ import deepdanbooru as dd
 import tensorflow as tf
 
 DEFAULT_PROJECT_CONTEXT = {
+    'source': 'danbooru',
     'image_width': 299,
     'image_height': 299,
     'database_uri': None,
