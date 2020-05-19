@@ -168,6 +168,7 @@ def download_tags(project_path, limit, minimum_post_count, is_overwrite):
 
     print('All processes are complete.')
 
+# TODO: factor out the common functionality (most of it)
 def derpi_import_tags(project_path, postgres_uri, limit, minimum_post_count, is_overwrite):
     project_context_path = os.path.join(project_path, 'project.json')
     project_context = dd.io.deserialize_from_json(project_context_path)

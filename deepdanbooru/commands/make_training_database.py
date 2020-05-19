@@ -94,8 +94,8 @@ def make_training_database(source_format, source_uri, output_path, start_id, end
             print('Inserting ...')
             out.cursor.executemany(
                 f"""INSERT INTO {out.table} (
-                {out.id.column},{out.filename.column},{out.foldername.column},{out.extension.column},{out.download_url.column},{out.tag_string.column},{out.tag_count_general.column})
-                values (?, ?, ?, ?, ?, ?)""", insert_params)
+                {out.id.column},{out.foldername.column},{out.filename.column},{out.extension.column},{out.download_url.column},{out.tag_string.column},{out.tag_count_general.column})
+                values (?, ?, ?, ?, ?, ?, ?)""", insert_params)
             out.connection.commit()
 
         current_start_id = rows[-1][src.id.column] + 1

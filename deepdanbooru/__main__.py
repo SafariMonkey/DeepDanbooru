@@ -51,7 +51,7 @@ def download_images(project_path, overwrite):
 @click.argument('source_format', type=click.Choice(['danbooru', 'derpibooru'], case_sensitive=False), required=True)
 @click.argument('source_uri', nargs=1, required=True)
 @click.argument('output_path', type=click.Path(exists=False, resolve_path=True, file_okay=True, dir_okay=False), nargs=1, required=True)
-@click.option('--start-id', default=1, help='Start id.', )
+@click.option('--start-id', default=0, help='Start id.', )
 @click.option('--end-id', default=sys.maxsize, help='End id.')
 @click.option('--use-deleted', help='Use deleted posts.', is_flag=True)
 @click.option('--chunk-size', default=5000000, help='Chunk size for internal processing.')
