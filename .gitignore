@@ -6,6 +6,7 @@ test.py
 /logs
 /uploads
 /devenv
+/devenv.old
 *.jpg
 *.jpeg
 *.png

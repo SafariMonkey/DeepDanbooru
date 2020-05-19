@@ -6,7 +6,7 @@ DEFAULT_PROJECT_CONTEXT = {
     'source': 'danbooru',
     'image_width': 299,
     'image_height': 299,
-    'database_uri': None,
+    'database_path': None,
     'images_path': None,
     'minimum_tag_count': 20,
     'model': 'resnet_custom_v2',

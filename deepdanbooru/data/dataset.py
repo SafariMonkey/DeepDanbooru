@@ -12,14 +12,18 @@ def load_image_records(sqlite_path, minimum_tag_count):
     if not os.path.exists(sqlite_path):
         raise Exception(f'SQLite database is not exists : {sqlite_path}')
 
-    connection = sqlite3.connect(sqlite_path)
+    try:
+        connection = sqlite3.connect(sqlite_path)
+    except Exception as e:
+        import pdb; pdb.set_trace()
+        pass
     connection.row_factory = sqlite3.Row
     cursor = connection.cursor()
 
     image_folder_path = os.path.join(os.path.dirname(sqlite_path), 'images')
 
     cursor.execute(
-        "SELECT foldername, filename, file_ext, tag_string FROM posts WHERE (extension = 'png' OR extension = 'jpg' OR extension = 'jpeg') AND (tag_count_general >= ?) ORDER BY id",
+        "SELECT foldername, filename, extension, tag_string, download_url FROM posts WHERE (extension = 'png' OR extension = 'jpg' OR extension = 'jpeg') AND (tag_count_general >= ?) ORDER BY id",
         (minimum_tag_count,))
 
     rows = cursor.fetchall()
@@ -29,12 +33,13 @@ def load_image_records(sqlite_path, minimum_tag_count):
     for row in rows:
         foldername = row['foldername']
         filename = row['filename']
-        extension = row['file_ext']
+        extension = row['extension']
         image_path = os.path.join(
             image_folder_path, foldername, f'{filename}.{extension}')
         tag_string = row['tag_string']
+        download_url = row['download_url']
 
-        image_records.append((image_path, tag_string))
+        image_records.append((image_path, tag_string, download_url))
 
     connection.close()
 

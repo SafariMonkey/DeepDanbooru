@@ -35,7 +35,7 @@ class DatasetWrapper:
 
         return dataset
 
-    def map_load_image(self, image_path, tag_array):
+    def map_load_image(self, image_path, tag_string):
         image_raw = tf.io.read_file(image_path)
         image = tf.io.decode_png(image_raw, channels=3)
 
@@ -49,12 +49,12 @@ class DatasetWrapper:
         image = tf.image.resize(
             image, size=size, method=tf.image.ResizeMethod.AREA, preserve_aspect_ratio=True)
 
-        return (image, tag_array)
+        return (image, tag_string)
 
-    def map_transform_image_and_label(self, image, tag_array):
-        return tf.py_function(self.map_transform_image_and_label_py, (image, tag_array), (tf.float32, tf.float32))
+    def map_transform_image_and_label(self, image, tag_string):
+        return tf.py_function(self.map_transform_image_and_label_py, (image, tag_string), (tf.float32, tf.float32))
 
-    def map_transform_image_and_label_py(self, image, tag_array):
+    def map_transform_image_and_label_py(self, image, tag_string):
         # transform image
         image = image.numpy()
 
@@ -89,7 +89,8 @@ class DatasetWrapper:
         # image = image.astype(np.float32)
 
         # transform tag
-        tag_array = tag_array.numpy()
+        tag_string = tag_string.numpy().decode()
+        tag_array = np.array(tag_string.split(','))
 
         labels = np.where(np.isin(self.tag_all_array,
                                   tag_array), 1, 0).astype(np.float32)

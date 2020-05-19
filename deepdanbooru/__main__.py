@@ -27,15 +27,24 @@ def create_project(project_path):
 @click.option('--minimum-post-count', default=500, help='Minimum post count for tag.')
 @click.option('--overwrite', help='Overwrite tags if exists.', is_flag=True)
 @click.argument('path', type=click.Path(exists=False, resolve_path=True, file_okay=False, dir_okay=True))
-def download_tags(path, limit, minimum_post_count, overwrite):
+def download_tags(path, limit, minimum_post_count, overwrite, derpi_postgres_uri):
     dd.commands.download_tags(path, limit, minimum_post_count, overwrite)
 
+@main.command('derpi-import-tags')
+@click.option('--limit', default=10000, help='Limit for each category tag count.')
+@click.option('--minimum-post-count', default=500, help='Minimum post count for the tag.')
+@click.option('--overwrite', help='Overwrite tags if exists.', is_flag=True)
+@click.argument('path', type=click.Path(exists=False, resolve_path=True, file_okay=False, dir_okay=True))
+@click.argument('postgres-uri', required=True)
+def derpi_import_tags(path, limit, minimum_post_count, overwrite, postgres_uri):
+    dd.commands.derpi_import_tags(path, postgres_uri, limit, minimum_post_count, overwrite)
 
-# @main.command('download-images')
-# @click.option('--overwrite', help='Overwrite images if exists.', is_flag=True)
-# @click.argument('path', type=click.Path(exists=False, resolve_path=True, file_okay=False, dir_okay=True))
-# def download_images(path, limit, minimum_post_count, overwrite):
-#     dd.commands.download_images(path, limit, minimum_post_count, overwrite)
+
+@main.command('download-images')
+@click.argument('project_path', type=click.Path(exists=True, resolve_path=True, file_okay=False, dir_okay=True))
+@click.option('--overwrite', help='Overwrite images if they exist.', is_flag=True)
+def download_images(project_path, overwrite):
+    dd.commands.download_images(project_path, overwrite)
 
 
 @main.command('make-training-database')

@@ -1,5 +1,6 @@
 from .create_project import create_project
-from .download_tags import download_tags
+from .download_tags import download_tags, derpi_import_tags
+from .download_images import download_images
 from .make_training_database import make_training_database
 from .train_project import train_project
 from .evaluate_project import evaluate_project
