@@ -15,6 +15,8 @@ def train_project(project_path):
     width = project_context['image_width']
     height = project_context['image_height']
     database_path = project_context['database_path']
+    pretrained_model_path = project_context['pretrained_model_path']
+    reset_pretrained_tag_layers = project_context['reset_pretrained_tag_layers']
     minimum_tag_count = project_context['minimum_tag_count']
     model_type = project_context['model']
     optimizer_type = project_context['optimizer']
@@ -108,6 +110,22 @@ def train_project(project_path):
         print("Checkpoint exists. Continuing training ...")
         checkpoint.restore(manager.latest_checkpoint)
         print(f'used_epoch={int(used_epoch)}, used_minibatch={int(used_minibatch)}, used_sample={int(used_sample)}, offset={int(offset)}, random_seed={int(random_seed)}')
+    elif pretrained_model_path is not None:
+        print('No checkpoint. Starting new training based on pretrained model...')
+        model.load_weights(pretrained_model_path, by_name=True,
+                           skip_mismatch=reset_pretrained_tag_layers is not False)
+        if reset_pretrained_tag_layers == 'zero':
+            for lay in model.layers[-3:]:
+                print("Resetting weights for layer {}".format(lay.name))
+                weights = [
+                    tf.zeros_initializer()(w.shape) for w in lay.get_weights()
+                ]
+                lay.set_weights(weights)
+        elif reset_pretrained_tag_layers == False:
+            pass
+        else:
+            raise Exception("Unhandled value of reset_pretrained_tag_layers")
+
     else:
         print('No checkpoint. Starting new training ...')
 

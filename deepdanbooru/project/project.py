@@ -8,6 +8,8 @@ DEFAULT_PROJECT_CONTEXT = {
     'image_height': 299,
     'database_path': None,
     'images_path': None,
+    'pretrained_model_path': None,
+    'reset_pretrained_tag_layers': 'zero',
     'minimum_tag_count': 20,
     'model': 'resnet_custom_v2',
     'minibatch_size': 32,
