@@ -82,7 +82,7 @@ def train_project(project_path):
                   metrics=[tf.keras.metrics.Precision(), tf.keras.metrics.Recall()])
 
     print(f'Loading database ... ')
-    image_records = dd.data.load_image_records(
+    image_records_orig = dd.data.load_image_records(
         database_path, minimum_tag_count)
 
     # Checkpoint variables
@@ -129,7 +129,7 @@ def train_project(project_path):
     else:
         print('No checkpoint. Starting new training ...')
 
-    epoch_size = len(image_records)
+    epoch_size = len(image_records_orig)
     slice_size = minibatch_size * checkpoint_frequency_mb
     loss_sum = 0.0
     loss_count = 0
@@ -138,6 +138,8 @@ def train_project(project_path):
 
     while int(used_epoch) < epoch_count:
         print(f'Shuffling samples (epoch {int(used_epoch)}) ... ')
+        # need to copy image_records so shuffle doesn't compose over itself
+        image_records = image_records_orig.copy()
         epoch_random = random.Random(int(random_seed))
         epoch_random.shuffle(image_records)
 
