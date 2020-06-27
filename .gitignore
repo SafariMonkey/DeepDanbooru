@@ -15,3 +15,4 @@ test.py
 *.h5
 *.txt
 *.json
+*.egg-info
