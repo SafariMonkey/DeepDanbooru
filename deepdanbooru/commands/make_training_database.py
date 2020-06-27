@@ -202,7 +202,7 @@ class DerpibooruSource(PostgresDatabase, SourceDatabase):
         self.id.query = 'i.id'
         self.tag_count_general.query = 'count(t.id)'
         self.tag_string.query = f"string_agg(t.name, '{self.tag_delimiter}')"
-        self.foldername.query = f"right(lpad(i.id::text, 2, '0'), 2)"
+        self.foldername.query = f"right(lpad(i.id::text, 7, '0'), 2)"
         self.filename.query = f"lpad(i.id::text, 7, '0')"
         self.extension.query = """
         case
