@@ -64,7 +64,7 @@ def download_images(project_path, is_overwrite):
                 image_path = os.path.join(
                     image_folder_path, foldername, f'{filename}.{extension}')
                 download_url = row['download_url']
-                batch_data.append((download_url, image_path))
+                batch_data.append((download_url, image_path, is_overwrite))
 
             results = list(fetch_images_parallel(batch_data))
             succeeded = len(batch_data) - results.count(None)
@@ -111,26 +111,36 @@ def fetch_images_parallel(images, executor=None):
         return executor.map(fetch_image_instrumented, images)
 
 
-def download_image(url, path):
-    local_session = thread_local_session()
-    r = local_session.get(url, stream=True)
-    if r.status_code == 200:
-        def write_file():
-            with open(path, "wb") as f:
-                for chunk in r:
-                    f.write(chunk)
-        try:
-            write_file()
-        except FileNotFoundError:
-            dd.io.try_create_directory(os.path.dirname(path))
-            write_file()
-        return True
-    else:
-        raise ImageFetchFailed(
-            "Fetching from URL {} to file {} failed: {}".format(
-                url, path, r.status
+def download_image(url, path, is_overwrite):
+    # So ideally, if is_overwrite is False, we don't want to download
+    # the image if the file already exists. However, we don't know if the
+    # file already exists until we're inside the file open block.
+    # Additionally, the directory may not exist, so we need to catch that case
+    # and create the directory and then retry. All this to say that we end up
+    # needing to define two functions and pass one to the other.
+    def download():
+        local_session = thread_local_session()
+        r = local_session.get(url, stream=True)
+        if r.status_code == 200:
+            return r
+        else:
+            raise ImageFetchFailed(
+                "Fetching from URL {} to file {} failed: {}".format(
+                    url, path, r.status
+                )
             )
-        )
+    def write_file(download_callback):
+        with open(path, "wb" if is_overwrite else "xb") as f:
+            for chunk in download_callback():
+                f.write(chunk)
+    try:
+        write_file(download)
+    except FileNotFoundError:
+        dd.io.try_create_directory(os.path.dirname(path))
+        write_file(download)
+    except FileExistsError:
+        return True
+    return True
 
 
 def thread_local_session():
