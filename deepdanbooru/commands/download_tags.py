@@ -203,51 +203,51 @@ def derpi_import_tags(project_path, postgres_uri, limit, minimum_post_count, is_
             'category': 'character',
             'path': os.path.join(project_path, 'tags-character.txt'),
         },
-        # {
-        #     'category_name': 'Content (fanmade)',
-        #     'category': 'content-fanmade',
-        #     'path': os.path.join(project_path, 'tags-content-fanmade.txt'),
-        # },
-        # {
-        #     'category_name': 'Content (official)',
-        #     'category': 'content-official',
-        #     'path': os.path.join(project_path, 'tags-content-official.txt'),
-        # },
+        {
+            'category_name': 'Content (fanmade)',
+            'category': 'content-fanmade',
+            'path': os.path.join(project_path, 'tags-content-fanmade.txt'),
+        },
+        {
+            'category_name': 'Content (official)',
+            'category': 'content-official',
+            'path': os.path.join(project_path, 'tags-content-official.txt'),
+        },
         # {
         #     'category_name': 'Error',
         #     'category': 'error',
         #     'path': os.path.join(project_path, 'tags-error.txt'),
         # },
-        # {
-        #     'category_name': 'OC',
-        #     'category': 'oc',
-        #     'path': os.path.join(project_path, 'tags-oc.txt'),
-        # },
-        # {
-        #     'category_name': 'Origin',
-        #     'category': 'origin',
-        #     'path': os.path.join(project_path, 'tags-origin.txt'),
-        # },
-        # {
-        #     'category_name': 'Rating',
-        #     'category': 'rating',
-        #     'path': os.path.join(project_path, 'tags-rating.txt'),
-        # },
-        # {
-        #     'category_name': 'Species',
-        #     'category': 'species',
-        #     'path': os.path.join(project_path, 'tags-species.txt'),
-        # },
-        # {
-        #     'category_name': 'Spoiler',
-        #     'category': 'spoiler',
-        #     'path': os.path.join(project_path, 'tags-spoiler.txt'),
-        # },
-        # {
-        #     'category_name': 'Other',
-        #     'category': None,
-        #     'path': os.path.join(project_path, 'tags-other.txt'),
-        # },
+        {
+            'category_name': 'OC',
+            'category': 'oc',
+            'path': os.path.join(project_path, 'tags-oc.txt'),
+        },
+        {
+            'category_name': 'Origin',
+            'category': 'origin',
+            'path': os.path.join(project_path, 'tags-origin.txt'),
+        },
+        {
+            'category_name': 'Rating',
+            'category': 'rating',
+            'path': os.path.join(project_path, 'tags-rating.txt'),
+        },
+        {
+            'category_name': 'Species',
+            'category': 'species',
+            'path': os.path.join(project_path, 'tags-species.txt'),
+        },
+        {
+            'category_name': 'Spoiler',
+            'category': 'spoiler',
+            'path': os.path.join(project_path, 'tags-spoiler.txt'),
+        },
+        {
+            'category_name': 'Other',
+            'category': None,
+            'path': os.path.join(project_path, 'tags-other.txt'),
+        },
     ]
 
     categories_for_web = []
