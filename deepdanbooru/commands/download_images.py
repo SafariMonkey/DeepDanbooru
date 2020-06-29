@@ -113,32 +113,36 @@ def fetch_images_parallel(images, executor=None):
 
 def download_image(url, path, is_overwrite):
     # So ideally, if is_overwrite is False, we don't want to download
-    # the image if the file already exists. However, we don't know if the
-    # file already exists until we're inside the file open block.
-    # Additionally, the directory may not exist, so we need to catch that case
-    # and create the directory and then retry. All this to say that we end up
-    # needing to define two functions and pass one to the other.
-    def download():
-        local_session = thread_local_session()
-        r = local_session.get(url, stream=True)
-        if r.status_code == 200:
-            return r
-        else:
-            raise ImageFetchFailed(
-                "Fetching from URL {} to file {} failed: {}".format(
-                    url, path, r.status
-                )
+    # the image if the file already exists. However, we don't get a
+    # FileExistsError until we're inside the file open block.
+    # (For this we cheat and use os.path.exists to avoid creating the file
+    # and then failing to download it.) Additionally, the directory may not
+    # exist, so we need to catch that case and create the directory and then
+    # retry.
+
+    if not is_overwrite and os.path.exists(path):
+        # The file already exists, so just return
+        return True
+
+    local_session = thread_local_session()
+    r = local_session.get(url, stream=True)
+    if r.status_code != 200:
+        raise ImageFetchFailed(
+            "Fetching from URL {} to file {} failed: {}".format(
+                url, path, r.status
             )
-    def write_file(download_callback):
+        )
+    def write_file():
         with open(path, "wb" if is_overwrite else "xb") as f:
-            for chunk in download_callback():
+            for chunk in r:
                 f.write(chunk)
     try:
-        write_file(download)
+        write_file()
     except FileNotFoundError:
         dd.io.try_create_directory(os.path.dirname(path))
-        write_file(download)
+        write_file()
     except FileExistsError:
+        # unexpected as we already checked the existence earlier
         return True
     return True
 
