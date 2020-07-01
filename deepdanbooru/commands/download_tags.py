@@ -1,5 +1,6 @@
 import os
 import time
+import csv
 
 import requests
 import psycopg2
@@ -169,6 +170,8 @@ def download_tags(project_path, limit, minimum_post_count, is_overwrite):
     print('All processes are complete.')
 
 # TODO: factor out the common functionality (most of it)
+
+
 def derpi_import_tags(project_path, postgres_uri, limit, minimum_post_count, is_overwrite):
     project_context_path = os.path.join(project_path, 'project.json')
     project_context = dd.io.deserialize_from_json(project_context_path)
@@ -176,9 +179,12 @@ def derpi_import_tags(project_path, postgres_uri, limit, minimum_post_count, is_
         raise Exception('download-tags is only available on derpibooru projects')
 
     all_tags_path = os.path.join(project_path, 'tags.txt')
-    
+    all_tags_metadata_path = os.path.join(project_path, 'tags_metadata.csv')
+
     if not is_overwrite and os.path.exists(all_tags_path):
         raise Exception(f'Tags file is already exists : {all_tags_path}')
+    if not is_overwrite and os.path.exists(all_tags_metadata_path):
+        raise Exception(f'Tags metadata file is already exists : {all_tags_metadata_path}')
 
     log = {
         'database': 'derpibooru',
@@ -256,7 +262,10 @@ def derpi_import_tags(project_path, postgres_uri, limit, minimum_post_count, is_
 
     total_tags_count = 0
 
-    with open(all_tags_path, 'w') as all_tags_stream:
+    with open(all_tags_path, 'w') as all_tags_stream, \
+            open(all_tags_metadata_path, 'w') as all_tags_metadata_stream:
+        metadata_writer = csv.writer(all_tags_metadata_stream, quoting=csv.QUOTE_NONNUMERIC)
+
         for category_definition in category_definitions:
             category = category_definition['category']
             category_tags_path = category_definition['path']
@@ -265,11 +274,11 @@ def derpi_import_tags(project_path, postgres_uri, limit, minimum_post_count, is_
 
             cursor.execute(
                 """
-                    SELECT t.name, count(it.image_id) FROM tags t
+                    SELECT t.id, t.name, t.slug, count(it.image_id) FROM tags t
                     JOIN image_taggings it ON it.tag_id = t.id
                     WHERE t.category = %(category)s
                         OR (t.category IS NULL AND %(category)s IS NULL)
-                    GROUP BY t.name 
+                    GROUP BY t.id, t.name, t.slug
                     HAVING count(it.image_id) > %(post_count)s
                     ORDER BY count(it.image_id) DESC
                     LIMIT %(limit)s
@@ -277,9 +286,9 @@ def derpi_import_tags(project_path, postgres_uri, limit, minimum_post_count, is_
                 {'category': category, 'post_count': minimum_post_count,
                  'limit': limit})
 
-            tags = [row[0] for row in cursor]
+            tags = [row for row in cursor]
 
-            tags = dd.extra.natural_sorted(tags)
+            tags = sorted(tags, key=lambda x: dd.extra.natural_keys(x[1]))
             tag_count = len(tags)
             if tag_count == 0:
                 print(f'{category} tags not found matching criteria.')
@@ -288,9 +297,10 @@ def derpi_import_tags(project_path, postgres_uri, limit, minimum_post_count, is_
                 print(f'{tag_count} tags have been processed.')
 
             with open(category_tags_path, 'w') as category_tags_stream:
-                for tag in tags:
-                    category_tags_stream.write(f'{tag}\n')
-                    all_tags_stream.write(f'{tag}\n')
+                for (tag_id, tag_name, tag_slug, image_count) in tags:
+                    category_tags_stream.write(f'{tag_name}\n')
+                    all_tags_stream.write(f'{tag_name}\n')
+                    metadata_writer.writerow([tag_id, tag_name, tag_slug, image_count])
 
             categories_for_web.append(
                 {'name': category_definition['category_name'], 'start_index': tag_start_index})
@@ -303,4 +313,3 @@ def derpi_import_tags(project_path, postgres_uri, limit, minimum_post_count, is_
         )
 
     dd.io.serialize_as_json(categories_for_web, categories_for_web_path)
-
