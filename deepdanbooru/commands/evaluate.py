@@ -7,7 +7,7 @@ import tensorflow as tf
 import deepdanbooru as dd
 
 
-def run_inference_on(
+def evaluate_image_raw(
     image_input: Union[str, six.BytesIO], model: Any
 ) -> Iterable[Tuple[str, float]]:
     width = model.input_shape[2]
@@ -26,7 +26,7 @@ def run_inference_on(
 def evaluate_image(
     image_input: Union[str, six.BytesIO], model: Any, tags: List[str], threshold: float
 ) -> Iterable[Tuple[str, float]]:
-    y = run_inference_on(image_input, model)
+    y = evaluate_image_raw(image_input, model)
 
     result_dict = {}
 
