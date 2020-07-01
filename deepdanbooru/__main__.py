@@ -102,7 +102,6 @@ def evaluate(target_paths, project_path, model_path, tags_path, threshold, allow
 
 
 @main.command('serve', help='Serve model by estimating image tag.')
-@click.option('--postgres-uri', required=True)
 @click.option('--port', default=8000)
 @click.option('--project-path', type=click.Path(exists=True, resolve_path=True, file_okay=False, dir_okay=True),
               help='Project path. If you want to use specific model and tags, use --model-path and --tags-path options.')
