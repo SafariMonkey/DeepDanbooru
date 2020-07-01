@@ -7,8 +7,8 @@ import tensorflow as tf
 import deepdanbooru as dd
 
 
-def evaluate_image(
-    image_input: Union[str, six.BytesIO], model: Any, tags: List[str], threshold: float
+def run_inference_on(
+    image_input: Union[str, six.BytesIO], model: Any
 ) -> Iterable[Tuple[str, float]]:
     width = model.input_shape[2]
     height = model.input_shape[1]
@@ -20,6 +20,13 @@ def evaluate_image(
     image = image.reshape(
         (1, image_shape[0], image_shape[1], image_shape[2]))
     y = model.predict(image)[0]
+
+    return y
+
+def evaluate_image(
+    image_input: Union[str, six.BytesIO], model: Any, tags: List[str], threshold: float
+) -> Iterable[Tuple[str, float]]:
+    y = run_inference_on(image_input, model)
 
     result_dict = {}
 
@@ -76,7 +83,9 @@ def evaluate(target_paths, project_path, model_path, tags_path, threshold, allow
 
     for image_path in target_image_paths:
         print(f'Tags of {image_path}:')
-        for tag, score in evaluate_image(image_path, model, tags, threshold):
+        tags_gen = evaluate_image(image_path, model, tags, threshold)
+        for tag, score in sorted(tags_gen, key=lambda tag_score: tag_score[1]):
             print(f'({score:05.3f}) {tag}')
 
         print()
+
