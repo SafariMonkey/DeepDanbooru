@@ -31,25 +31,12 @@ def evaluate_image(
             yield tag, result_dict[tag]
 
 
-def evaluate(target_paths, project_path, model_path, tags_path, threshold, allow_gpu, compile_model, allow_folder, folder_filters, verbose):
-    if not allow_gpu:
-        os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
-
+def load_model(project_path, model_path, tags_path, compile_model, verbose):
     if not model_path and not project_path:
         raise Exception('You must provide project path or model path.')
 
     if not tags_path and not project_path:
         raise Exception('You must provide project path or tags path.')
-
-    target_image_paths = []
-
-    for target_path in target_paths:
-        if allow_folder and not os.path.isfile(target_path):
-            target_image_paths.extend(dd.io.get_image_file_paths_recursive(target_path, folder_filters))
-        else:
-            target_image_paths.append(target_path)
-
-    target_image_paths = dd.extra.natural_sorted(target_image_paths)
 
     if model_path:
         if verbose:
@@ -68,6 +55,24 @@ def evaluate(target_paths, project_path, model_path, tags_path, threshold, allow
         if verbose:
             print(f'Loading tags from project {project_path} ...')
         tags = dd.project.load_tags_from_project(project_path)
+
+    return model, tags
+
+def evaluate(target_paths, project_path, model_path, tags_path, threshold, allow_gpu, compile_model, allow_folder, folder_filters, verbose):
+    if not allow_gpu:
+        os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+
+    model, tags = load_model(project_path, model_path, tags_path, compile_model, verbose)
+
+    target_image_paths = []
+
+    for target_path in target_paths:
+        if allow_folder and not os.path.isfile(target_path):
+            target_image_paths.extend(dd.io.get_image_file_paths_recursive(target_path, folder_filters))
+        else:
+            target_image_paths.append(target_path)
+
+    target_image_paths = dd.extra.natural_sorted(target_image_paths)
 
     for image_path in target_image_paths:
         print(f'Tags of {image_path}:')

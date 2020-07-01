@@ -6,3 +6,4 @@ from .train_project import train_project
 from .evaluate_project import evaluate_project
 from .grad_cam import grad_cam
 from .evaluate import evaluate, evaluate_image
+from .serve import serve_model
