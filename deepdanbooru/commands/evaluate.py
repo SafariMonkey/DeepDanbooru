@@ -38,7 +38,8 @@ def evaluate_image(
             yield tag, result_dict[tag]
 
 
-def load_model(project_path, model_path, tags_path, compile_model, verbose):
+def load_model(project_path, model_path, tags_path, compile_model, verbose,
+               load_tags_metadata=True, tags_metadata_path=None):
     if not model_path and not project_path:
         raise Exception('You must provide project path or model path.')
 
@@ -63,13 +64,25 @@ def load_model(project_path, model_path, tags_path, compile_model, verbose):
             print(f'Loading tags from project {project_path} ...')
         tags = dd.project.load_tags_from_project(project_path)
 
-    return model, tags
+    if tags_metadata_path:
+        if verbose:
+            print(f'Loading tags metadata from {tags_metadata_path} ...')
+        tags_metadata = dd.data.load_tags_metadata(tags_metadata_path)
+    else:
+        if verbose:
+            print(f'Loading tags metadata from project {project_path} ...')
+        try:
+            tags_metadata = dd.project.load_tags_metadata_from_project(project_path)
+        except FileNotFoundError:
+            tags_metadata = None
+
+    return model, tags, tags_metadata
 
 def evaluate(target_paths, project_path, model_path, tags_path, threshold, allow_gpu, compile_model, allow_folder, folder_filters, verbose):
     if not allow_gpu:
         os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
-    model, tags = load_model(project_path, model_path, tags_path, compile_model, verbose)
+    model, tags, _ = load_model(project_path, model_path, tags_path, compile_model, verbose, load_tags_metadata=False)
 
     target_image_paths = []
 

@@ -107,12 +107,13 @@ def evaluate(target_paths, project_path, model_path, tags_path, threshold, allow
               help='Project path. If you want to use specific model and tags, use --model-path and --tags-path options.')
 @click.option('--model-path', type=click.Path(exists=True, resolve_path=True, file_okay=True, dir_okay=False))
 @click.option('--tags-path', type=click.Path(exists=True, resolve_path=True, file_okay=True, dir_okay=False))
+@click.option('--tags-metadata-path', type=click.Path(exists=True, resolve_path=True, file_okay=True, dir_okay=False))
 @click.option('--default-threshold', default=0.5)
 @click.option('--allow-gpu', default=False, is_flag=True)
 @click.option('--compile/--no-compile', 'compile_model', default=False)
 @click.option('--verbose', default=False, is_flag=True)
-def serve(port, project_path, model_path, tags_path, default_threshold, allow_gpu, compile_model, verbose):
-    dd.commands.serve_model(port, project_path, model_path, tags_path, default_threshold, allow_gpu, compile_model, verbose)
+def serve(port, project_path, model_path, tags_path, tags_metadata_path, default_threshold, allow_gpu, compile_model, verbose):
+    dd.commands.serve_model(port, project_path, model_path, tags_path, tags_metadata_path, default_threshold, allow_gpu, compile_model, verbose)
 
 
 if __name__ == '__main__':

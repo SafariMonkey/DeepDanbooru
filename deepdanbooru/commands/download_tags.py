@@ -219,11 +219,11 @@ def derpi_import_tags(project_path, postgres_uri, limit, minimum_post_count, is_
             'category': 'content-official',
             'path': os.path.join(project_path, 'tags-content-official.txt'),
         },
-        # {
-        #     'category_name': 'Error',
-        #     'category': 'error',
-        #     'path': os.path.join(project_path, 'tags-error.txt'),
-        # },
+        {
+            'category_name': 'Error',
+            'category': 'error',
+            'path': os.path.join(project_path, 'tags-error.txt'),
+        },
         {
             'category_name': 'OC',
             'category': 'oc',
@@ -300,7 +300,7 @@ def derpi_import_tags(project_path, postgres_uri, limit, minimum_post_count, is_
                 for (tag_id, tag_name, tag_slug, image_count) in tags:
                     category_tags_stream.write(f'{tag_name}\n')
                     all_tags_stream.write(f'{tag_name}\n')
-                    metadata_writer.writerow([tag_id, tag_name, tag_slug, image_count])
+                    metadata_writer.writerow([tag_id, tag_name, category, tag_slug, image_count])
 
             categories_for_web.append(
                 {'name': category_definition['category_name'], 'start_index': tag_start_index})

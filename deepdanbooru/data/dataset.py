@@ -1,4 +1,5 @@
 import os
+import csv
 import sqlite3
 
 
@@ -6,6 +7,12 @@ def load_tags(tags_path):
     with open(tags_path, 'r') as tags_stream:
         tags = [tag for tag in (tag.strip() for tag in tags_stream) if tag]
         return tags
+
+
+def load_tags_metadata(tags_metadata_path):
+    with open(tags_metadata_path, 'r', newline='') as tags_metadata_stream:
+        reader = csv.reader(tags_metadata_stream)
+        return list(reader)
 
 
 def load_image_records(sqlite_path, minimum_tag_count):

@@ -52,3 +52,9 @@ def load_tags_from_project(project_path):
     tags_path = os.path.join(project_path, 'tags.txt')
 
     return dd.data.load_tags(tags_path)
+
+
+def load_tags_metadata_from_project(project_path):
+    tags_path = os.path.join(project_path, 'tags_metadata.csv')
+
+    return dd.data.load_tags_metadata(tags_path)
